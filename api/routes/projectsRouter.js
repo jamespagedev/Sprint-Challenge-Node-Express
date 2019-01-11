@@ -3,6 +3,7 @@
  **************************************************************************************************/
 const express = require('express');
 const db = require('../../data/helpers/projectModel.js');
+const projectValidation = require('../../middleware/projectValidation.js');
 const router = express.Router();
 
 /***************************************************************************************************
@@ -49,7 +50,7 @@ router.get('/:id/actions', (req, res) => {
 });
 
 // /api/projects
-router.post('/', (req, res) => {
+router.post('/', projectValidation, (req, res) => {
   let newProject;
   if (req.body.hasOwnProperty('completed')) {
     const { name, description, completed } = req.body;
@@ -65,7 +66,7 @@ router.post('/', (req, res) => {
     .catch(err => res.status(500).json({ message: err }));
 });
 
-// /api/users/:id
+// /api/projects/:id
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
@@ -88,8 +89,8 @@ router.delete('/:id', (req, res) => {
     );
 });
 
-// /api/users/:id
-router.put('/:id', (req, res) => {
+// /api/projects/:id
+router.put('/:id', projectValidation, (req, res) => {
   const id = req.params.id;
   const changes = req.body;
 
