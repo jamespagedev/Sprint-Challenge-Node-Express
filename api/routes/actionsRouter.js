@@ -3,6 +3,7 @@
  **************************************************************************************************/
 const express = require('express');
 const db = require('../../data/helpers/actionModel.js');
+const projectsDb = require('../../data/helpers/projectModel.js');
 const actionValidation = require('../../middleware/actionValidation.js');
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.get('/:id', (req, res) => {
 });
 
 // /api/actions
-router.post('/', actionValidation, (req, res, next) => {
+router.post('/', actionValidation, (req, res) => {
   let newAction;
 
   if (req.body.hasOwnProperty('completed')) {
@@ -47,11 +48,21 @@ router.post('/', actionValidation, (req, res, next) => {
     newAction = { project_id, description, notes };
   }
 
-  db.insert(newAction)
-    .then(result => {
-      res.status(201).json(result);
+  // Validate project_id exists
+  projectsDb
+    .get(newAction.project_id)
+    .then(response => {
+      db.insert(newAction)
+        .then(result => {
+          res.status(201).json(result);
+        })
+        .catch(err => res.status(500).json({ message: err }));
     })
-    .catch(err => res.status(500).json({ message: err }));
+    .catch(err =>
+      res
+        .status(500)
+        .json({ message: `Action with id ${newAction.project_id} not found` })
+    );
 });
 
 // /api/users/:id
@@ -82,22 +93,33 @@ router.put('/:id', actionValidation, (req, res) => {
   const id = req.params.id;
   const changes = req.body;
 
-  db.get(id)
-    .then(action => {
-      if (action) {
-        db.update(id, changes)
-          .then(result => res.status(200).json(result))
-          .catch(err => res.status(500).json({ error: err }));
-      } else {
-        res.status(404).json({
-          error: `The action with the specific ID '${id}' does not exist`
-        });
-      }
+  // validate project id exists
+  projectsDb
+    .get(changes.project_id)
+    .then(response => {
+      // validate action id exists
+      db.get(id)
+        .then(action => {
+          if (action) {
+            db.update(id, changes)
+              .then(result => res.status(200).json(result))
+              .catch(err => res.status(500).json({ error: err }));
+          } else {
+            res.status(404).json({
+              error: `The action with the specific ID '${id}' does not exist`
+            });
+          }
+        })
+        .catch(err =>
+          res.status(500).json({
+            error: `The action with the specific ID '${id}' does not exist`
+          })
+        );
     })
     .catch(err =>
-      res.status(500).json({
-        error: `The action with the specific ID '${id}' does not exist`
-      })
+      res
+        .status(500)
+        .json({ message: `Action with id ${changes.project_id} not found` })
     );
 });
 
