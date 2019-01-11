@@ -36,7 +36,7 @@ Demonstrate your understanding of this Sprint's concepts by answering the follow
 
 - [x] Describe a Resource?
 
-  - A resource would represent the data being called and managed by our web api backend. In this project for example, they would be the "" and "".
+  - A resource would represent the data being called and managed by our web api backend. In this project for example, they would be the "01-projects.js" and "02-actions.js".
 
 - [x] What can the API return to help clients know if a request was successful?
 
