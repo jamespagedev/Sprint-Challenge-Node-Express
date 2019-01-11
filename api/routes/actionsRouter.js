@@ -3,6 +3,7 @@
  **************************************************************************************************/
 const express = require('express');
 const db = require('../../data/helpers/actionModel.js');
+const actionValidation = require('../../middleware/actionValidation.js');
 const router = express.Router();
 
 /***************************************************************************************************
@@ -35,8 +36,9 @@ router.get('/:id', (req, res) => {
 });
 
 // /api/actions
-router.post('/', (req, res) => {
+router.post('/', actionValidation, (req, res, next) => {
   let newAction;
+
   if (req.body.hasOwnProperty('completed')) {
     const { project_id, description, notes, completed } = req.body;
     newAction = { project_id, description, notes, completed };
@@ -44,6 +46,7 @@ router.post('/', (req, res) => {
     const { project_id, description, notes } = req.body;
     newAction = { project_id, description, notes };
   }
+
   db.insert(newAction)
     .then(result => {
       res.status(201).json(result);
@@ -75,7 +78,7 @@ router.delete('/:id', (req, res) => {
 });
 
 // /api/users/:id
-router.put('/:id', (req, res) => {
+router.put('/:id', actionValidation, (req, res) => {
   const id = req.params.id;
   const changes = req.body;
 
