@@ -18,8 +18,10 @@ server.get('/', (req, res) => {
 });
 
 const projectsRouter = require('./routes/projectsRouter.js');
+const actionsRouter = require('./routes/actionsRouter.js');
 
 server.use('/api/projects', projectsRouter);
+server.use('/api/actions', actionsRouter);
 
 /***************************************************************************************************
  ********************************************* export(s) *******************************************
