@@ -12,14 +12,9 @@ module.exports = {
 
       return Promise.all(promises).then(function(results) {
         let [project, actions] = results;
+        project.actions = actions;
 
-        if (!project) {
-          return null;
-        } else {
-          project.actions = actions;
-
-          return mappers.projectToBody(project);
-        }
+        return mappers.projectToBody(project);
       });
     }
 
