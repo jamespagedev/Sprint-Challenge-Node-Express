@@ -42,5 +42,5 @@ module.exports = {
     return db('projects')
       .where('id', id)
       .del();
-  },
+  }
 };
